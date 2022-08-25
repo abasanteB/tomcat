@@ -1,0 +1,55 @@
+#Tareas de instalacion de tomcat server
+
+#Tasks to install Tomcat Server
+
+
+
+- name: Create group name for Tomcat
+  group:
+    name: tomcat
+    state: present
+    system: yes
+
+- name: Create user for Tomcat
+  user:
+    name: tomcat
+    append: yes
+    create_home: yes
+    group: tomcat
+    home: "{{ tomcat_home }}"
+    shell: /bin/false
+    state: present
+    system: yes
+
+- name: download and unarchive tomcat-{{ tomcat_version}}
+  unarchive:
+    src: "{{ tomcat_download_url }}"
+    dest: "{{ tomcat_home }}"
+    remote_src: yes
+    extra_opts: [--strip-components=1]
+
+- name: Change ownership of tomcat directory
+  file:
+    path: "{{ tomcat_home }}"
+    owner: tomcat
+    group: tomcat
+    mode: "u+rwx,g+rx,o=rx"
+    recurse: yes
+    state: directory
+
+
+- name: Copy Tomcat service file
+  copy:
+    src: /tmp/playbooks/files/tomcat.service
+    dest: /etc/systemd/system/
+    mode: 0755
+
+
+- name: Start and enable Tomcat 9 on server
+  systemd:
+    name: tomcat
+    state: started
+    daemon_reload: yes
+    enabled: yes
+
+

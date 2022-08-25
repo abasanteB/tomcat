@@ -1,0 +1,25 @@
+
+-
+  hosts: localhost
+  become: true
+  become_method: sudo
+  become_user: root
+
+  tasks:
+
+    - include_vars: vars.yml
+
+    - ansible.builtin.import_tasks: basic_package.yml
+      vars:
+       - dependencies: "{{ dependencies }}"
+
+    - ansible.builtin.import_tasks: install_java.yml
+      vars:
+       - java_package: "{{ java_package }}"
+
+    - ansible.builtin.import_tasks: install_tomcat.yml
+      vars:
+       - tomcat_home: "{{ tomcat_home }}"
+       - tomcat_download_url: "{{ tomcat_download_url }}"
+       
+       
